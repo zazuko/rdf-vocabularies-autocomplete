@@ -23,7 +23,11 @@ export async function activate(context: vscode.ExtensionContext) {
 			});
 
 		const prefixedValuesList = Array.from(uniquePrefixedValues.values())
-			.map((val) => new vscode.CompletionItem(val));
+			.map((val) => {
+				const completionItem = new vscode.CompletionItem(val);
+				completionItem.documentation = expand(val);
+				return completionItem;
+			});
 
 		const completionProvider = vscode.languages.registerCompletionItemProvider(
 			'*',
@@ -36,16 +40,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		);
 		context.subscriptions.push(completionProvider);
 	}
-
-	// suggest prefixes: add suggestions for all prefixes: `r` -> ['rdf:', 'rdfs:', …]
-	const completionProvider = vscode.languages.registerCompletionItemProvider(
-		'*',
-		{
-			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) {
-				return Object.keys(datasets).map((prefix) => new vscode.CompletionItem(`${prefix}:`));
-			}
-		});
-	context.subscriptions.push(completionProvider);
 }
 
 // this method is called when your extension is deactivated
