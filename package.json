@@ -1,5 +1,5 @@
 {
-	"name": "rdf-prefix-complete",
+	"name": "rdf-vocabularies-autocomplete",
 	"displayName": "RDF Prefix Complete",
 	"description": "Autocompletion and suggestion for RDF prefixes",
 	"version": "0.0.1",

@@ -1,4 +1,4 @@
-# rdf-prefix-complete
+# rdf-vocabularies-autocomplete
 
 ## How to Test it Locally
 
