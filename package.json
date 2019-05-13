@@ -1,0 +1,38 @@
+{
+	"name": "rdf-prefix-complete",
+	"displayName": "RDF Prefix Complete",
+	"description": "Autocompletion and suggestion for RDF prefixes",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.33.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onLanguage:notation3",
+		"onLanguage:ntriples",
+		"onLanguage:sparql",
+		"onLanguage:turtle"
+	],
+	"main": "./out/extension.js",
+	"contributes": {},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"@types/mocha": "^2.2.42",
+		"@types/node": "^10.12.21",
+		"@types/rdf-js": "^2.0.1",
+		"tslint": "^5.12.1",
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28"
+	},
+	"dependencies": {
+		"@zazuko/rdf-vocabularies": "^2019.5.6"
+	}
+}
