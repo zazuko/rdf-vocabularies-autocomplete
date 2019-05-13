@@ -18,25 +18,34 @@ export async function activate(context: vscode.ExtensionContext) {
 			.forEach(({ subject }: { subject: Term }) => {
 				const shrinked = shrink(subject.value);
 				if (shrinked && !shrinked.endsWith(':')) {
-					uniquePrefixedValues.add(new vscode.CompletionItem(shrinked));
+					uniquePrefixedValues.add(shrinked);
 				}
 			});
-			const prefixedValuesList = Array.from(uniquePrefixedValues.values());
 
-			context.subscriptions.push(vscode.languages.registerCompletionItemProvider('*', {
+		const prefixedValuesList = Array.from(uniquePrefixedValues.values())
+			.map((val) => new vscode.CompletionItem(val));
+
+		const completionProvider = vscode.languages.registerCompletionItemProvider(
+			'*',
+			{
 				provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) {
 					return prefixedValuesList;
 				}
-			}, `${prefix}:`));
-		}
+			},
+			`${prefix}:`
+		);
+		context.subscriptions.push(completionProvider);
+	}
 
 	// suggest prefixes: add suggestions for all prefixes: `r` -> ['rdf:', 'rdfs:', …]
-	const prefixes = Object.keys(datasets).map((prefix) => new vscode.CompletionItem(`${prefix}:`));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('*', {
-		provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) {
-			return prefixes;
-		}
-	}));
+	const completionProvider = vscode.languages.registerCompletionItemProvider(
+		'*',
+		{
+			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken) {
+				return Object.keys(datasets).map((prefix) => new vscode.CompletionItem(`${prefix}:`));
+			}
+		});
+	context.subscriptions.push(completionProvider);
 }
 
 // this method is called when your extension is deactivated
