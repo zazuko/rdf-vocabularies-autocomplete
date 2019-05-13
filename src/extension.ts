@@ -3,7 +3,16 @@ import { Term } from 'rdf-js';
 
 const rdfVocabularies = require('@zazuko/rdf-vocabularies');
 const { expand, shrink } = rdfVocabularies;
+
 const isA = expand('rdf:type');
+const comment = expand('rdfs:comment');
+
+interface CompletionsIndex {
+	[key:string]: {
+		iri: string,
+		description: string
+	};
+}
 
 export async function activate(context: vscode.ExtensionContext) {
 	const datasets = await rdfVocabularies();
@@ -11,21 +20,29 @@ export async function activate(context: vscode.ExtensionContext) {
 	// suggest values for a given prefix:
 	// show suggestions as soon as `prefix:` is typed: `rdfs:` -> ['rdfs:Class', …]
 	for (const [prefix, dataset] of Object.entries(datasets)) {
-		const uniquePrefixedValues = new Set();
+		const completionsIndex: CompletionsIndex = {};
 		dataset
 			// @ts-ignore
 			.match(null, isA)
 			.forEach(({ subject }: { subject: Term }) => {
-				const shrinked = shrink(subject.value);
+				const shrinked: string = shrink(subject.value);
 				if (shrinked && !shrinked.endsWith(':')) {
-					uniquePrefixedValues.add(shrinked);
+					const description = dataset
+						// @ts-ignore
+						.match(subject, comment)
+						.toArray()[0];
+
+					completionsIndex[shrinked] = {
+						iri: subject.value,
+						description: description ? description.object.value : ''
+					};
 				}
 			});
 
-		const prefixedValuesList = Array.from(uniquePrefixedValues.values())
-			.map((val) => {
-				const completionItem = new vscode.CompletionItem(val);
-				completionItem.documentation = expand(val);
+		const prefixedValuesList = Object.entries(completionsIndex)
+			.map(([key, object]) => {
+				const completionItem = new vscode.CompletionItem(key);
+				completionItem.documentation = new vscode.MarkdownString(`[${object.description || object.iri}](${object.iri})`);
 				return completionItem;
 			});
 
